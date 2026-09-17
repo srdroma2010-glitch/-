@@ -35,10 +35,21 @@ jobs:
         if: failure()
         run: tail -n 100 build.log
 
+      - name: Find APK
+        if: always()
+        run: |
+          echo "===== Searching for APK everywhere ====="
+          find . -name "*.apk" -type f 2>/dev/null | head -50
+          echo "===== Done ====="
+
       - name: Upload APK
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: snake-apk
-          path: bin/*.apk
+          path: |
+            bin/*.apk
+            .buildozer/**/bin/*.apk
+            .buildozer/**/*.apk
+            **/*.apk
           if-no-files-found: warn
