@@ -14,7 +14,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.10'
 
       - name: Install system dependencies
         run: |
@@ -24,14 +24,21 @@ jobs:
       - name: Install Buildozer
         run: |
           pip install --upgrade pip
-          pip install cython==0.29.36
-          pip install buildozer
+          pip install cython==0.29.33
+          pip install buildozer==1.5.0
 
       - name: Build APK with Buildozer
         run: |
-          yes | buildozer android debug
+          buildozer android debug 2>&1 | tee build.log
+
+      - name: Show last lines of log if failed
+        if: failure()
+        run: |
+          echo "===== LAST 100 LINES OF LOG ====="
+          tail -n 100 build.log
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: snake-apk
